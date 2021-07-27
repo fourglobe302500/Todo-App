@@ -1,0 +1,202 @@
+@import url("https://fonts.googleapis.com/css2?family=Asap&display=swap");
+
+$backgroundColor: (
+  "normal": #0c0c0c,
+  "todo-list": dimgray,
+  "todo": #2f2f2f,
+  "task": #4f4f4f,
+  "json": #808080,
+);
+$textHeights: (
+  "todo": 1rem,
+  "task": 0.7rem,
+);
+
+$textColor: wheat;
+
+@function bgColor($key) {
+  @return map-get($map: $backgroundColor, $key: $key);
+}
+
+@function height($key) {
+  @return map-get($map: $textHeights, $key: $key);
+}
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Asap", sans-serif;
+}
+
+body {
+  background-color: bgColor(normal);
+  color: $textColor;
+}
+
+.download {
+  position: absolute;
+  right: 0;
+  top: 0;
+  border: 1px solid blue;
+  border-radius: 0.5rem;
+  padding: 0.25rem;
+  background-color: bgColor(json);
+
+  a {
+    color: $textColor;
+  }
+}
+
+.App {
+  width: 100vw;
+  min-height: 100vh;
+  > .list-todo {
+    width: 30%;
+    position: fixed;
+    top: 1rem;
+    overflow-x: hidden;
+    padding: 1rem 0.5rem;
+    border: 1px solid blue;
+    border-radius: 1rem;
+    background-color: bgColor(todo-list);
+
+    &.left {
+      left: 2.5vw;
+    }
+
+    &.center {
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    &.right {
+      right: 2.5vw;
+    }
+
+    > .list-todo-bar {
+      width: 100%;
+      position: relative;
+      display: flex;
+      margin: auto;
+      margin-bottom: 1rem;
+      justify-content: center;
+
+      > .add-children {
+        position: absolute;
+        right: 1rem;
+        width: 2rem;
+        font-size: 1.5rem;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+    }
+  }
+}
+
+.container {
+  padding: 0.5rem;
+  border: 1px solid blue;
+  border-radius: 0.5rem;
+
+  &-todo {
+    background-color: bgColor(todo);
+  }
+
+  &-task {
+    background-color: bgColor(todo);
+  }
+}
+
+.item {
+  margin-bottom: 1rem;
+  padding-right: 0.7rem;
+  &.last-item {
+    margin-bottom: 0;
+  }
+
+  > .container {
+    margin-left: 0.7rem;
+  }
+
+  &-todo > .container {
+    margin-top: 0.6rem;
+  }
+
+  &-task > .container {
+    margin-top: 0.4rem;
+  }
+}
+
+.msg {
+  display: flex;
+  width: 100%;
+  position: relative;
+
+  > .checkBox {
+    margin-right: 0.5rem;
+    border-radius: 0.25rem;
+  }
+
+  &-todo {
+    > .checkBox {
+      height: height(todo);
+      width: height(todo);
+    }
+
+    > .item-bar > .icon-container > .icon {
+      height: height(todo);
+      margin-bottom: 0.2rem;
+    }
+
+    > .editing {
+      background-color: bgColor(todo);
+      color: $textColor;
+      width: 70%;
+      height: height(todo) + 0.2rem;
+      font-size: height(todo);
+    }
+  }
+
+  &-task {
+    > .checkBox {
+      height: height(task);
+      width: height(task);
+    }
+
+    > .item-bar > .icon-container > .icon {
+      height: height(task);
+      margin-bottom: 0.2rem;
+    }
+
+    > .editing {
+      background-color: bgColor(task);
+      color: $textColor;
+      width: 70%;
+      height: height(task) + 0.2rem;
+      font-size: height(task);
+    }
+  }
+
+  > .item-bar {
+    display: flex;
+    position: absolute;
+    right: 1rem;
+    user-select: none;
+
+    > .icon-container {
+      color: white;
+      margin-left: 0.5rem;
+
+      &:hover {
+        cursor: pointer;
+      }
+    }
+  }
+}
+
+.danger {
+  color: darkred !important;
+}
