@@ -48,7 +48,7 @@ export const ItemBar: React.FC<ItemBarProps> = ({
 
   const reset = () => {
     changeEditing(false);
-    setNewMsg(msg);
+    msg === "" ? deleteSelf() : setNewMsg(msg);
   };
 
   return (
