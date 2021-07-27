@@ -6,6 +6,10 @@ $backgroundColor: (
   "todo": #2f2f2f,
   "task": #4f4f4f,
   "json": #808080,
+  "dialoge": #00000088,
+  "dialoge-content": #6f6f6f,
+  "ok": green,
+  "cancel": darkred,
 );
 $textHeights: (
   "todo": 1rem,
@@ -14,12 +18,72 @@ $textHeights: (
 
 $textColor: wheat;
 
+$warningTextColor: #8f0000;
+
 @function bgColor($key) {
   @return map-get($map: $backgroundColor, $key: $key);
 }
 
 @function height($key) {
   @return map-get($map: $textHeights, $key: $key);
+}
+
+@mixin dialoge {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: bgColor(dialoge);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .content {
+    padding: 1rem;
+    background-color: bgColor(dialoge-content);
+    border: 1px solid black;
+    border-radius: 1rem;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+
+    .warning {
+      color: $warningTextColor;
+    }
+
+    .buttons {
+      padding: 0.5rem;
+      border: 1px solid black;
+      border-radius: 0.5rem;
+      background-color: white;
+      margin-top: 2rem;
+
+      button {
+        padding: 0.5rem;
+        border-radius: 1rem;
+        margin-left: 1rem;
+        font-size: 1.5rem;
+      }
+
+      *:first-child {
+        margin-left: 0 !important;
+      }
+
+      .ok {
+        background-color: bgColor(ok);
+      }
+
+      .cancel {
+        background-color: bgColor(cancel);
+        color: $textColor;
+      }
+    }
+  }
+
+  &-hidden {
+    visibility: hidden;
+  }
 }
 
 *,
@@ -34,6 +98,23 @@ $textColor: wheat;
 body {
   background-color: bgColor(normal);
   color: $textColor;
+}
+
+.dialoge {
+  position: absolute;
+  width: 100vw;
+  height: 100vh;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+
+  .loading-new-content {
+    @include dialoge;
+  }
+
+  .invallid-new-content {
+    @include dialoge;
+  }
 }
 
 .download {
@@ -53,7 +134,7 @@ body {
 .App {
   width: 100vw;
   min-height: 100vh;
-  > .list-todo {
+  .list-todo {
     width: 30%;
     position: fixed;
     top: 1rem;
@@ -76,7 +157,7 @@ body {
       right: 2.5vw;
     }
 
-    > .list-todo-bar {
+    .list-todo-bar {
       width: 100%;
       position: relative;
       display: flex;
@@ -84,7 +165,7 @@ body {
       margin-bottom: 1rem;
       justify-content: center;
 
-      > .add-children {
+      .add-children {
         position: absolute;
         right: 1rem;
         width: 2rem;
@@ -117,15 +198,15 @@ body {
     margin-bottom: 0;
   }
 
-  > .container {
+  .container {
     margin-left: 0.7rem;
   }
 
-  &-todo > .container {
+  &-todo .container {
     margin-top: 0.6rem;
   }
 
-  &-task > .container {
+  &-task .container {
     margin-top: 0.4rem;
   }
 }
@@ -135,23 +216,23 @@ body {
   width: 100%;
   position: relative;
 
-  > .checkBox {
+  .checkBox {
     margin-right: 0.5rem;
     border-radius: 0.25rem;
   }
 
   &-todo {
-    > .checkBox {
+    .checkBox {
       height: height(todo);
       width: height(todo);
     }
 
-    > .item-bar > .icon-container > .icon {
+    .item-bar .icon-container .icon {
       height: height(todo);
       margin-bottom: 0.2rem;
     }
 
-    > .editing {
+    .editing {
       background-color: bgColor(todo);
       color: $textColor;
       width: 70%;
@@ -161,17 +242,17 @@ body {
   }
 
   &-task {
-    > .checkBox {
+    .checkBox {
       height: height(task);
       width: height(task);
     }
 
-    > .item-bar > .icon-container > .icon {
+    .item-bar .icon-container .icon {
       height: height(task);
       margin-bottom: 0.2rem;
     }
 
-    > .editing {
+    .editing {
       background-color: bgColor(task);
       color: $textColor;
       width: 70%;
@@ -180,13 +261,13 @@ body {
     }
   }
 
-  > .item-bar {
+  .item-bar {
     display: flex;
     position: absolute;
     right: 1rem;
     user-select: none;
 
-    > .icon-container {
+    .icon-container {
       color: white;
       margin-left: 0.5rem;
 

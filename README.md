@@ -10,4 +10,6 @@
 - Task nesting
 - Todo editing
 - Todos persistance
-- Download of data in json format
+- Download of data in JSON format
+- Load of data in JSON format
+  

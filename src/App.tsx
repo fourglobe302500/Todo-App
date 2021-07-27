@@ -1,42 +1,18 @@
-import React, { useEffect, useState } from "react";
+import React, { DragEventHandler, useEffect, useState } from "react";
 import { FaFileDownload } from "react-icons/fa";
 import { TodoList } from "./components/TodoList";
 import { State, Task, Todo } from "./Types";
 
 export const App = () => {
-  const newTask = (
-    msg: string,
-    childrenTasks = [] as Task[],
-    done = false,
-    manualShowChildren = true,
-  ): Task => ({
-    msg,
-    done,
-    childrenTasks,
-    manualShowChildren,
-    autoShowChildren: manualShowChildren,
-    editing: false,
-  });
-
-  const newTodo = (
-    msg: string,
-    tasks = [] as Task[],
-    done = false,
-    manualShowChildren = true,
-  ): Todo => ({
-    msg,
-    done,
-    tasks,
-    manualShowChildren,
-    autoShowChildren: manualShowChildren,
-    editing: false,
-  });
-
   const [state, setState] = useState<State>(
     JSON.parse(
       localStorage.getItem("fgTL") || '{"Todos":[],"Doings":[],"Dones":[]}',
     ),
   );
+
+  const [loadingNewData, setLoadingNewData] = useState(false);
+  const [invallidNewData, setInvallidNewData] = useState(false);
+  const [newData, setNewData] = useState("");
 
   const commitTodo =
     (maker: (todo: Todo | null) => State) =>
@@ -120,20 +96,124 @@ export const App = () => {
     return () => {};
   }, [state]);
 
-  const href = () => {
-    const json = JSON.stringify(state);
-    const blob = new Blob([json], { type: "application/json" });
-    return URL.createObjectURL(blob);
+  const href = () =>
+    URL.createObjectURL(
+      new Blob([JSON.stringify(state, undefined, 2)], {
+        type: "application/json",
+      }),
+    );
+
+  const validateData = (data: string) => {
+    try {
+      JSON.parse(data);
+      setLoadingNewData(true);
+    } catch (ex) {
+      setInvallidNewData(true);
+    }
+  };
+
+  const handleDrop: DragEventHandler = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const files = e.dataTransfer.files;
+    if (files && files.length === 1) {
+      const file = files[0];
+      const fr = new FileReader();
+      fr.addEventListener("load", () => {
+        setNewData(() => {
+          validateData(fr.result as string);
+          return fr.result as string;
+        });
+      });
+      fr.addEventListener("error", () => {
+        setInvallidNewData(true);
+      });
+      fr.readAsText(file);
+      e.dataTransfer.clearData();
+      return;
+    }
+    e.dataTransfer.clearData();
+    setInvallidNewData(true);
   };
 
   return (
     <>
+      {loadingNewData || invallidNewData ? (
+        <div className="dialoge">
+          {loadingNewData ? (
+            <div className="loading-new-content">
+              <div className="content">
+                <h1 className="warning">
+                  Loading external files will delete current todos
+                </h1>
+                <div className="buttons">
+                  <button
+                    className="ok"
+                    onClick={() => {
+                      setLoadingNewData(false);
+                      setState(JSON.parse(newData));
+                      setNewData("");
+                    }}
+                  >
+                    Ok
+                  </button>
+                  <button
+                    className="cancel"
+                    onClick={() => {
+                      setLoadingNewData(false);
+                      setNewData("");
+                    }}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <></>
+          )}
+          {invallidNewData ? (
+            <div className="invallid-new-content">
+              <div className="content">
+                <h1 className="warning">Invallid JSON format</h1>
+                <div className="buttons">
+                  <button
+                    className="ok"
+                    onClick={() => {
+                      setInvallidNewData(false);
+                      setNewData("");
+                    }}
+                  >
+                    Ok
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <></>
+          )}
+        </div>
+      ) : (
+        <></>
+      )}
       <div className="download">
         <a href={href()} download="todo-list.json">
           <FaFileDownload />
         </a>
       </div>
-      <div className="App">
+      <div
+        className="App"
+        onDrop={handleDrop}
+        onDragEnter={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+        onDragOver={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+      >
         <TodoList
           state="todos"
           todos={state.Todos}
